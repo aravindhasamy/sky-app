@@ -17,7 +17,6 @@
     "react-router-dom": "^7.9.4",
     "react-scripts": "5.0.1",
     "recharts": "^3.3.0",
-    "sky-toolkit": "^2.39.2",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },

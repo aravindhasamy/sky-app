@@ -89,3 +89,62 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
+.breadcrumb {
+  background-color: #1f1f1f;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "⟩";
+  color: #999;
+  padding: 0 6px;
+}
+
+.breadcrumb-item a {
+  color: #0073c5;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+  color: #fff;
+}
+
+.breadcrumb-item.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.asset-detail-background {
+  position: relative;
+  width: 100%;
+}
+
+.asset-detail-background::before {
+  content: "";
+  position: fixed;
+  top: -20px;
+  left: -20px;
+  width: calc(100vw + 40px);
+  height: calc(100vh + 40px);
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(15px) brightness(0.5);
+  z-index: 0;
+  opacity: 1;
+}
+
+.asset-detail-background.loaded::before {
+  opacity: 1;
+}
+
+.asset-detail-background > .container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}

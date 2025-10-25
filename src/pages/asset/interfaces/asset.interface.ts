@@ -10,7 +10,7 @@ export interface Asset {
   totalViews: TotalViews;
   prevTotalViews: TotalViews;
   description: string;
-  duration: number; // seconds
+  duration: number;
   assetImage: string;
   videoImage: string;
   provider: string;

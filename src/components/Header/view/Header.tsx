@@ -5,30 +5,35 @@ import "../styles/Header.css";
 export default function Header() {
   return (
     <nav className="navbar navbar-expand shadow-sm bg-dark sticky-header">
-      <div className="container d-flex align-items-center">
-        <NavLink
-          to="/assets"
-          className="d-flex align-items-center text-decoration-none me-3"
-        >
-          <img src={logo} alt="Logo" className="me-2 header-logo-image" />
-        </NavLink>
-        <div className="navbar-nav ms-auto">
+      <div className="container">
+        <div className="d-flex align-items-center">
+          {/* Logo */}
           <NavLink
             to="/assets"
-            className={({ isActive }) =>
-              `nav-link px-3${isActive ? " active" : ""}`
-            }
+            className="d-flex align-items-center text-decoration-none me-3"
           >
-            Assets
+            <img src={logo} alt="Logo" className="me-2 header-logo-image" />
           </NavLink>
-          <NavLink
-            to="/timeseries"
-            className={({ isActive }) =>
-              `nav-link px-3${isActive ? " active" : ""}`
-            }
-          >
-            Timeseries
-          </NavLink>
+
+          {/* Links next to logo */}
+          <div className="navbar-nav d-flex flex-row">
+            <NavLink
+              to="/assets"
+              className={({ isActive }) =>
+                `nav-link px-3${isActive ? " active" : ""}`
+              }
+            >
+              Assets
+            </NavLink>
+            <NavLink
+              to="/timeseries"
+              className={({ isActive }) =>
+                `nav-link px-3${isActive ? " active" : ""}`
+              }
+            >
+              Timeseries
+            </NavLink>
+          </div>
         </div>
       </div>
     </nav>

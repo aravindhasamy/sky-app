@@ -45,8 +45,6 @@ function ErrorFallback({
   );
 }
 
-// 404 Page
-
 function App() {
   return (
     <Router>

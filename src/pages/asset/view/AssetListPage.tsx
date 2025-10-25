@@ -67,7 +67,7 @@ export default function AssetListPage() {
   }
 
   return (
-    <div className="container mt-4 mb-4">
+    <div className="container mt-4">
       <div className=" mb-4 movies-title-container">
         <h1 className="movies-title">Movies</h1>
       </div>
@@ -89,7 +89,7 @@ export default function AssetListPage() {
                 <Card.Subtitle className="mb-2 text-muted">
                   {asset.provider}
                 </Card.Subtitle>
-                <Card.Subtitle>{formatDuration(asset.duration)}</Card.Subtitle>
+                <Card.Subtitle className="small">{formatDuration(asset.duration)}</Card.Subtitle>
                 <Card.Text>{asset.description.slice(0, 30)}...</Card.Text>
                 <div>
                   {asset.genre.map((g) => (
