@@ -51,7 +51,7 @@ export default function AssetListPage() {
     return (
       <div className="text-center mt-5">
         <Spinner animation="border" variant="primary" />
-        <p className="mt-3 fs-5 text-muted">Loading assets...</p>
+        <p className="mt-3 fs-5 text-muted">Loading movies...</p>
       </div>
     );
   }

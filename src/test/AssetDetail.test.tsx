@@ -71,8 +71,8 @@ describe("AssetDetailPage", () => {
     renderWithRouter("/assets/Movie%20A");
 
     // Wait for async fetch to resolve
-    const movieTitle = await screen.findByText(/^Movie A/i);
-    expect(movieTitle).toBeInTheDocument();
+    const movieTitle = await screen.findByTestId("movie-title");
+    expect(movieTitle).toHaveTextContent(/^Movie A/i);
 
     const netflixElements = await screen.findAllByText(/^Netflix$/i);
     expect(netflixElements.length).toBeGreaterThan(0);

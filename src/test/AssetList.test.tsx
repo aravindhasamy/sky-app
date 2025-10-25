@@ -1,9 +1,30 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import TimeSeriesPage from "../pages/timeseries/view/TimeSeriesPage";
+import { render, screen, act } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import AssetListPage from "../pages/asset/view/AssetListPage";
+// import AssetListPage from "../pages/AssetListPage";
 
-// Mock ResizeObserver to prevent recharts errors
+const mockAssets = [
+  {
+    name: "Movie A",
+    provider: "Netflix",
+    description: "A great movie about AI and humanity.",
+    duration: 7200,
+    genre: ["Drama", "Sci-Fi"],
+    assetImage: "movie-a.jpg",
+    videoImage: "",
+  },
+  {
+    name: "Movie B",
+    provider: "Prime Video",
+    description: "An exciting thriller.",
+    duration: 5400,
+    genre: ["Thriller"],
+    assetImage: "movie-b.jpg",
+    videoImage: "",
+  },
+];
+
 beforeAll(() => {
   global.ResizeObserver = class {
     observe() {}
@@ -12,53 +33,87 @@ beforeAll(() => {
   };
 });
 
-const mockData = [
-  { timestamp: "2025-10-24T00:00:00Z", value: 12 },
-  { timestamp: "2025-10-25T00:00:00Z", value: 24 },
-];
+beforeEach(() => {
+  jest.clearAllMocks();
+  global.fetch = jest.fn() as jest.Mock;
+});
 
-const renderWithRouter = (ui: React.ReactElement) => {
-  return render(<BrowserRouter>{ui}</BrowserRouter>);
-};
+afterEach(() => {
+  jest.resetAllMocks();
+});
 
-describe("TimeSeriesPage", () => {
-  beforeEach(() => {
-    jest.spyOn(global, "fetch").mockImplementation(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(mockData),
-      } as Response)
+describe("AssetListPage", () => {
+  test("renders loading spinner initially", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockAssets,
+    });
+
+    render(
+      <MemoryRouter>
+        <AssetListPage />
+      </MemoryRouter>
     );
+
+    const loadingText = await screen.findByText(/loading assets/i);
+    expect(loadingText).toBeInTheDocument();
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
+  test("renders list of assets after successful fetch", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockAssets,
+    });
 
-  test("renders loading spinner initially", () => {
-    renderWithRouter(<TimeSeriesPage />);
-    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
-  });
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <AssetListPage />
+        </MemoryRouter>
+      );
+    });
 
-  test("renders chart when data loads successfully", async () => {
-    renderWithRouter(<TimeSeriesPage />);
+    const movieA = await screen.findByText("Movie A");
+    const movieB = await screen.findByText("Movie B");
 
-    expect(screen.getByText(/Time Series Explorer/i)).toBeInTheDocument();
+    expect(movieA).toBeInTheDocument();
+    expect(movieB).toBeInTheDocument();
 
-    expect(await screen.findByText("24 Oct")).toBeInTheDocument();
-    expect(await screen.findByText("25 Oct")).toBeInTheDocument();
+    // Providers
+    expect(await screen.findByText("Netflix")).toBeInTheDocument();
+    expect(await screen.findByText("Prime Video")).toBeInTheDocument();
+
+    // Genres
+    expect(await screen.findByText("Drama")).toBeInTheDocument();
+    expect(await screen.findByText("Sci-Fi")).toBeInTheDocument();
+    expect(await screen.findByText("Thriller")).toBeInTheDocument();
+
+    // Duration formatting check
+    expect(await screen.findByText("2h 0m")).toBeInTheDocument(); // Movie A 7200s
+    expect(await screen.findByText("1h 30m")).toBeInTheDocument(); // Movie B 5400s
+
+    // Truncated description
+    expect(screen.getByText(/A great movie about AI and hum/i)).toBeInTheDocument();
+    expect(screen.getByText(/An exciting thriller/i)).toBeInTheDocument();
   });
 
   test("renders error message on failed fetch", async () => {
-    jest.restoreAllMocks();
-    jest
-      .spyOn(global, "fetch")
-      .mockImplementation(() => Promise.reject(new Error("Failed fetch")));
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("Fetch failed"));
 
-    renderWithRouter(<TimeSeriesPage />);
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <AssetListPage />
+        </MemoryRouter>
+      );
+    });
 
     expect(
-      screen.getByText(/Failed to load time series data/i)
+      await screen.findByText(/Failed to load movies/i)
     ).toBeInTheDocument();
+
+    jest.restoreAllMocks();
   });
 });

@@ -109,7 +109,7 @@ export default function AssetDetailPage() {
           <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/assets" }}>
             Movies
           </Breadcrumb.Item>
-          <Breadcrumb.Item active>{asset.name}</Breadcrumb.Item>
+          <Breadcrumb.Item data-testid="movie-title" active>{asset.name}</Breadcrumb.Item>
         </Breadcrumb>
 
         <Card className="p-4 shadow-sm">
