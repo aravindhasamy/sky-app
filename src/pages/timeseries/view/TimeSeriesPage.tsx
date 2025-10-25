@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   XAxis,
   YAxis,
@@ -10,34 +10,50 @@ import {
 } from "recharts";
 import Card from "react-bootstrap/Card";
 import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 import dayjs from "dayjs";
-
-interface TimeSeriesData {
-  timestamp: number;
-  value: number;
-}
+import "../styles/TimeSeries.css";
+import { TimeSeriesData } from "../interfaces";
 
 export default function TimeSeriesPage() {
-  const [data, setData] = useState<
-    (TimeSeriesData & { date: string })[] | null
-  >(null);
+  const [data, setData] = useState<(TimeSeriesData & { date: string })[] | []>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    fetch(
-      "https://my-json-server.typicode.com/alb90/aieng-tech-test-timeseries/data"
-    )
-      .then((res) => res.json())
-      .then((rawData: TimeSeriesData[]) => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          "https://my-json-server.typicode.com/alb90/aieng-tech-test-timeseries/data"
+        );
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        const rawData: TimeSeriesData[] = await res.json();
         const formatted = rawData.map((item) => ({
           ...item,
           date: dayjs(item.timestamp).format("DD MMM YYYY"),
         }));
         setData(formatted);
-      })
-      .catch(console.error);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load time series data. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  if (!data) {
+  if (loading) {
     return (
       <div className="text-center mt-5">
         <Spinner animation="border" variant="primary" />
@@ -46,13 +62,20 @@ export default function TimeSeriesPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="container my-5">
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="container my-4 p-4 rounded"
-      style={{ backgroundColor: "#f8f9fa" }}
-    >
+    <div className="container my-4 p-4 rounded time-series-custom-container">
       <Card className="p-4 shadow-sm border-0">
-        <h3 className="mb-2 text-center" style={{ color: "#0073c5" }}>
+        <h3 className="mb-2 text-center time-series-title">
           Time Series Explorer
         </h3>
         <p className="text-center text-muted mb-4">

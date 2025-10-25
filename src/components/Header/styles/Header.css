@@ -1,0 +1,29 @@
+.header-logo-image {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* base style for nav links */
+.nav-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-weight: 400;
+    border-bottom: none;
+    transition: color 0.3s, border-bottom 0.3s;
+    padding: 0 1rem; /* equivalent to px-3 in Bootstrap */
+    text-decoration: none; /* optional */
+  }
+  
+  /* active state */
+  .nav-link.active {
+    color: white !important;
+    font-weight: 600;
+    border-bottom: 3px solid #ffcc00;
+  }
+
+  .sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }

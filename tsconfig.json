@@ -22,5 +22,11 @@
   },
   "include": [
     "src"
-  ]
+  ],
+  "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ES2017",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx"
 }

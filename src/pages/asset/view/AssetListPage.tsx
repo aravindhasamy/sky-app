@@ -1,28 +1,11 @@
 // src/pages/AssetListPage.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 import { Link } from "react-router-dom";
-
-interface TotalViews {
-  total: number;
-  "sky-go": number;
-  "now-tv": number;
-  peacock: number;
-}
-
-interface Asset {
-  name: string;
-  totalViews: TotalViews;
-  prevTotalViews: TotalViews;
-  description: string;
-  duration: number; // seconds
-  assetImage: string;
-  videoImage: string;
-  provider: string;
-  genre: string[];
-}
+import { Asset } from "../interfaces";
 
 const API_URL =
   "https://my-json-server.typicode.com/alb90/aieng-tech-test-assets/data";
@@ -38,72 +21,79 @@ export default function AssetListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchedRef = useRef(false);
+
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch assets");
-        return res.json();
-      })
-      .then((data: Asset[]) => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
+    const fetchAssets = async () => {
+      try {
+        const res = await fetch(API_URL);
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        const data: Asset[] = await res.json();
         setAssets(data);
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || "Unknown error");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load movies. Please try again later.");
         setLoading(false);
-      });
+      }
+    };
+
+    fetchAssets();
   }, []);
 
   if (loading) {
     return (
       <div className="text-center mt-5">
-        <Spinner animation="border" />
-        <p>Loading assets...</p>
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3 fs-5 text-muted">Loading assets...</p>
       </div>
     );
   }
 
   if (error) {
-    return <p className="text-danger text-center mt-5">Error: {error}</p>;
+    return (
+      <div className="container mt-5">
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      </div>
+    );
   }
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">Movies</h1>
+    <div className="container mt-4 mb-4">
+      <div className=" mb-4 movies-title-container">
+        <h1 className="movies-title">Movies</h1>
+      </div>
       <div className="d-flex flex-wrap gap-3 justify-content-start">
         {assets.map((asset) => (
-          <Card
-            key={asset.name}
-            style={{ width: "48%", padding: 10 }}
-            className="shadow-sm"
-          >
+          <Card key={asset.name} className="shadow-sm card-custom">
             <Link
               to={`/assets/${encodeURIComponent(asset.name)}`}
-              style={{ textDecoration: "none", color: "inherit" }}
+              className="card-link"
             >
               <Card.Img
                 variant="top"
                 src={asset.videoImage || asset.assetImage}
                 alt={asset.name}
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  objectFit: "contain",
-                  borderRadius: 6,
-                }}
+                className="asset-list-card-image"
               />
               <Card.Body>
-                <Card.Title>{asset.name}</Card.Title>
+                <Card.Title data-testid="asset-title">{asset.name}</Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">
                   {asset.provider}
                 </Card.Subtitle>
-                <Card.Text>{asset.description.slice(0, 80)}...</Card.Text>
+                <Card.Subtitle>{formatDuration(asset.duration)}</Card.Subtitle>
+                <Card.Text>{asset.description.slice(0, 30)}...</Card.Text>
                 <div>
-                  <Badge bg="secondary" className="me-1">
-                    {formatDuration(asset.duration)}
-                  </Badge>
                   {asset.genre.map((g) => (
-                    <Badge bg="secondary" key={g} className="me-1">
+                    <Badge bg="dark" key={g} className="me-1">
                       {g}
                     </Badge>
                   ))}

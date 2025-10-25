@@ -1,27 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import Spinner from "react-bootstrap/Spinner";
-
-interface TotalViews {
-  total: number;
-  "sky-go": number;
-  "now-tv": number;
-  peacock: number;
-}
-
-interface Asset {
-  name: string;
-  totalViews: TotalViews;
-  prevTotalViews: TotalViews;
-  description: string;
-  duration: number;
-  assetImage: string;
-  videoImage: string;
-  provider: string;
-  genre: string[];
-}
+import Alert from "react-bootstrap/Alert";
+import "../styles/Asset.css";
+import { Asset, TotalViews } from "../interfaces";
 
 const API_URL =
   "https://my-json-server.typicode.com/alb90/aieng-tech-test-assets/data";
@@ -38,48 +22,70 @@ export default function AssetDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchedRef = useRef(false);
+  
+
   useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
     if (!name) {
-      setError("Invalid asset name");
+      setError("Invalid movie name");
       setLoading(false);
       return;
     }
-
-    fetch(API_URL)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch assets");
-        return res.json();
-      })
-      .then((data: Asset[]) => {
+  
+    const fetchAsset = async () => {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+  
+        const data: Asset[] = await res.json();
+  
         const decodedName = decodeURIComponent(name).toLowerCase().trim();
         const found = data.find(
           (a) => a.name.toLowerCase().trim() === decodedName
         );
-
+  
         if (!found) {
-          setError("Asset not found");
+          setError("Movie not found");
         } else {
           setAsset(found);
         }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load movie details. Please try again later.");
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || "Unknown error");
-        setLoading(false);
-      });
+      }
+    };
+  
+    fetchAsset();
   }, [name]);
+  
 
   if (loading) {
     return (
       <div className="text-center mt-5">
-        <Spinner animation="border" />
-        <p>Loading asset details...</p>
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3 fs-5 text-muted">Loading movie details...</p>
       </div>
     );
   }
 
   if (error) {
-    return <p className="text-danger text-center mt-5">Error: {error}</p>;
+    return (
+      <div className="container mt-5">
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+        <div className="text-center mt-3">
+          <Link to="/assets" className="btn btn-primary">
+            Back to Movies List
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (!asset) {
@@ -87,9 +93,10 @@ export default function AssetDetailPage() {
   }
 
   return (
-    <div className="container mt-4" style={{ maxWidth: 900 }}>
-      <Link to="/assets" className="btn btn-link mb-3">
-        ← Back to Asset List
+    <div className="container mt-4 custom-container">
+      
+      <Link to="/assets" className="btn btn-back mb-3">
+        Back to Movies List
       </Link>
 
       <Card className="p-4 shadow-sm">
@@ -98,12 +105,7 @@ export default function AssetDetailPage() {
             <img
               src={asset.videoImage || asset.assetImage}
               alt={asset.name}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: 6,
-              }}
+              className="asset-detail-image"
             />
           </div>
 
@@ -117,7 +119,7 @@ export default function AssetDetailPage() {
             <p>
               <strong>Genres:</strong>{" "}
               {asset.genre.map((g) => (
-                <Badge bg="secondary" className="me-1" key={g}>
+                <Badge bg="dark" className="me-1" key={g}>
                   {g}
                 </Badge>
               ))}
@@ -139,7 +141,7 @@ export default function AssetDetailPage() {
                 const diff = current - prev;
                 const diffSign = diff > 0 ? "+" : "";
                 return (
-                  <div key={providerKey} style={{ minWidth: 120 }}>
+                  <div key={providerKey} className="providerkey-container">
                     <strong>{providerKey.toUpperCase()}</strong>
                     <p>
                       {current.toLocaleString()} ({diffSign}
