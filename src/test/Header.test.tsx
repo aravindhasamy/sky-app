@@ -12,7 +12,7 @@ describe("Header component", () => {
 
     const logo = screen.getByAltText(/logo/i) as HTMLImageElement;
     expect(logo).toBeInTheDocument();
-    expect(logo.src).toContain("test-file-stub"); // optional check for correct image
+    expect(logo.src).toContain("test-file-stub");
   });
 
   test("renders navigation links", () => {

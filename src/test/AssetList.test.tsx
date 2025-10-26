@@ -1,8 +1,6 @@
-import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import AssetListPage from "../pages/asset/view/AssetListPage";
-// import AssetListPage from "../pages/AssetListPage";
 
 const mockAssets = [
   {
@@ -89,16 +87,19 @@ describe("AssetListPage", () => {
     expect(await screen.findByText("Thriller")).toBeInTheDocument();
 
     // Duration formatting check
-    expect(await screen.findByText("2h 0m")).toBeInTheDocument(); // Movie A 7200s
-    expect(await screen.findByText("1h 30m")).toBeInTheDocument(); // Movie B 5400s
+    expect(await screen.findByText("2h 0m")).toBeInTheDocument();
+    expect(await screen.findByText("1h 30m")).toBeInTheDocument();
 
-    // Truncated description
-    expect(screen.getByText(/A great movie about AI and hum/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/A great movie about AI and hum/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/An exciting thriller/i)).toBeInTheDocument();
   });
 
   test("renders error message on failed fetch", async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("Fetch failed"));
+    (global.fetch as jest.Mock).mockRejectedValueOnce(
+      new Error("Fetch failed")
+    );
 
     jest.spyOn(console, "error").mockImplementation(() => {});
 

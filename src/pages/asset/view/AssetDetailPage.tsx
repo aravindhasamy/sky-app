@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
@@ -109,11 +109,13 @@ export default function AssetDetailPage() {
           <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/assets" }}>
             Movies
           </Breadcrumb.Item>
-          <Breadcrumb.Item data-testid="movie-title" active>{asset.name}</Breadcrumb.Item>
+          <Breadcrumb.Item data-testid="movie-title" active>
+            {asset.name}
+          </Breadcrumb.Item>
         </Breadcrumb>
 
         <Card className="p-4 shadow-sm">
-          <div className="d-flex flex-row"> 
+          <div className="d-flex flex-row">
             <div>
               <img
                 src={asset.videoImage || asset.assetImage}

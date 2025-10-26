@@ -1,5 +1,4 @@
-// src/pages/AssetListPage.tsx
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import Spinner from "react-bootstrap/Spinner";
@@ -89,7 +88,9 @@ export default function AssetListPage() {
                 <Card.Subtitle className="mb-2 text-muted">
                   {asset.provider}
                 </Card.Subtitle>
-                <Card.Subtitle className="small">{formatDuration(asset.duration)}</Card.Subtitle>
+                <Card.Subtitle className="small">
+                  {formatDuration(asset.duration)}
+                </Card.Subtitle>
                 <Card.Text>{asset.description.slice(0, 30)}...</Card.Text>
                 <div>
                   {asset.genre.map((g) => (
